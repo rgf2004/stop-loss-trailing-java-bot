@@ -1,0 +1,9 @@
+#sleep time in seconds
+application.sleep.interval=60
+
+application.bittrex.api=Your Bittrex API
+application.bittrex.secret=Your Bittrex Secret
+
+application.telegram.token=Your Telegram Bot Token
+application.telegram.user=Your Telegram Bot user Name
+application.telegram.channelid=Your Telegram Bot Channel ID
