@@ -1,7 +1,6 @@
 package com.github.stoploss.core.models;
 
 import com.github.stoploss.core.enums.Action;
-import com.github.stoploss.core.utils.Utils;
 import lombok.Data;
 import lombok.ToString;
 
@@ -10,16 +9,20 @@ import java.math.BigDecimal;
 @Data
 @ToString
 public class MarketMonitor {
-    private Market market;
-    private BigDecimal currentThreshold;
-    private BigDecimal currentPrice;
+
     private Action action;
+    private BigDecimal amount;
+    private BigDecimal percentage;
+    private BigDecimal currentPrice;
+    private BigDecimal currentThreshold;
     private String currentUUId;
 
-    public MarketMonitor (BigDecimal currentPrice, Market market) {
-        this.setAction ( Action.SELL );
-        this.setCurrentPrice ( currentPrice );
-        this.setMarket ( market );
-        this.setCurrentThreshold ( Utils.calculateThreshold ( Action.SELL, currentPrice, market.getPercentage () ) );
+    public MarketMonitor(Action action, BigDecimal amount, BigDecimal percentage)
+    {
+        this.action = action;
+        this.amount = amount;
+        this.percentage = percentage;
+        this.currentPrice = null;
+        this.currentThreshold = null;
     }
 }
