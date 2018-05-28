@@ -53,40 +53,41 @@ class StopLossEngine {
     private void processNewPrice(String marketName, BigDecimal currentPrice) {
 
         MarketMonitor marketMonitor = currenciesManager.getMarketMonitor ( marketName );
+
         if (marketMonitor.getCurrentPrice () == null) { // first time
 
-            marketMonitor.setCurrentPrice ( currentPrice );
             currenciesManager.initThreshold ( marketName, currentPrice );
 
             LOGGER.info ( String.format ( "%10s First Time - Action %s with current last %05.8f, current threshold %05.8f", marketName, marketMonitor.getAction (), currentPrice, marketMonitor.getCurrentThreshold () ) );
         } else {
+
+            currenciesManager.setCurrentPrice ( marketName, currentPrice );
 
             if (marketMonitor.getCurrentUUId () == null) {
 
                 switch (marketMonitor.getAction ()) {
                     case SELL:
                         if (currentPrice.compareTo ( marketMonitor.getCurrentThreshold () ) <= 0) { // Sell case
-                            marketMonitor.setCurrentUUId ( createOrder ( marketMonitor.getAction (), marketName, currentPrice, marketMonitor.getAmount () ) );
+                            currenciesManager.setCurrentUUId ( marketName, createOrder ( marketMonitor.getAction (), marketName, currentPrice, marketMonitor.getAmount () ) );
                         } else {
                             BigDecimal newSellThreshold = Utils.calculateThreshold ( Action.SELL, currentPrice, marketMonitor.getPercentage () );
                             if (currentPrice.compareTo ( newSellThreshold ) > 0 && newSellThreshold.compareTo ( marketMonitor.getCurrentThreshold () ) > 0) {
                                 LOGGER.info ( String.format ( "%10s - Action %s New Stop Loss will be applied %05.8f", marketName, marketMonitor.getAction () ,  newSellThreshold ) );
-                                marketMonitor.setCurrentThreshold ( newSellThreshold );
+                                currenciesManager.setThreshold ( marketName, newSellThreshold );
                             } else {
                                 LOGGER.info ( String.format ( "%10s - Action %s Still current configuration valid with current last %05.8f, current threshold %05.8f", marketName, marketMonitor.getAction (), currentPrice, marketMonitor.getCurrentThreshold () ) );
                             }
                         }
-
                         break;
                     case BUY:
 
                         if (currentPrice.compareTo ( marketMonitor.getCurrentThreshold () ) >= 0) { // Buy case
-                            marketMonitor.setCurrentUUId ( createOrder ( marketMonitor.getAction (), marketName, currentPrice, marketMonitor.getAmount () ) );
+                            currenciesManager.setCurrentUUId ( marketName, createOrder ( marketMonitor.getAction (), marketName, currentPrice, marketMonitor.getAmount () ) );
                         } else {
                             BigDecimal newBuyThreshold = Utils.calculateThreshold ( Action.BUY, currentPrice, marketMonitor.getPercentage () );
                             if (currentPrice.compareTo ( newBuyThreshold ) < 0 && newBuyThreshold.compareTo ( marketMonitor.getCurrentThreshold () ) < 0) {
                                 LOGGER.info ( String.format ( "%10s - Action %s New Stop Loss will be applied %05.8f", marketName, marketMonitor.getAction () ,  newBuyThreshold ) );
-                                marketMonitor.setCurrentThreshold ( newBuyThreshold );
+                                currenciesManager.setThreshold ( marketName, newBuyThreshold );
                             } else {
                                 LOGGER.info ( String.format ( "%10s - Action %s Still current configuration valid with current last %05.8f, current threshold %05.8f", marketName, marketMonitor.getAction (), currentPrice, marketMonitor.getCurrentThreshold () ) );
                             }
@@ -94,27 +95,22 @@ class StopLossEngine {
                         break;
                 }
             } else {
-                checkingOpenOrder ( marketName, marketMonitor, currentPrice );
+                checkingOpenOrder ( marketName, currentPrice );
             }
         }
     }
 
-    private void checkingOpenOrder(String marketName, MarketMonitor marketMonitor, BigDecimal currentPrice) {
-        LOGGER.info ( String.format ( "%10s Current %s Order is in progress ... Checking it...", marketName, marketMonitor.getAction () ) );
+    private void checkingOpenOrder(String marketName, BigDecimal currentPrice) {
+        LOGGER.info ( String.format ( "%10s Current %s Order is in progress ... Checking it...", marketName, currenciesManager.getMarketMonitor ( marketName ).getAction () ) );
 
-        if (bittrex.isOrderOpen ( marketMonitor.getCurrentUUId () )) {
-            LOGGER.info ( String.format ( "%10s Current %s Order is still open...", marketName, marketMonitor.getAction () ) );
+        if (bittrex.isOrderOpen ( currenciesManager.getMarketMonitor ( marketName ).getCurrentUUId () )) {
+            LOGGER.info ( String.format ( "%10s Current %s Order is still open...", marketName, currenciesManager.getMarketMonitor ( marketName ).getAction () ) );
         } else {
-            LOGGER.info ( String.format ( "%10s Current %s Order has been finished", marketName, marketMonitor.getAction () ) );
-            marketMonitor.setCurrentUUId ( null );
-
-            if (marketMonitor.getAction () == Action.SELL)
-                marketMonitor.setAction ( Action.BUY );
-            else
-                marketMonitor.setAction ( Action.SELL );
-
-            BigDecimal newThreshold = Utils.calculateThreshold ( marketMonitor.getAction (), currentPrice, marketMonitor.getPercentage () );
-            marketMonitor.setCurrentThreshold ( newThreshold );
+            LOGGER.info ( String.format ( "%10s Current %s Order has been finished", marketName, currenciesManager.getMarketMonitor ( marketName ).getAction () ) );
+            currenciesManager.setCurrentUUId ( marketName, null );
+            currenciesManager.inverseAction ( marketName );
+            BigDecimal newThreshold = Utils.calculateThreshold ( currenciesManager.getMarketMonitor ( marketName ).getAction (), currentPrice, currenciesManager.getMarketMonitor ( marketName ).getPercentage () );
+            currenciesManager.setThreshold ( marketName, newThreshold );
             LOGGER.info ( String.format ( "%10s New Stop Loss After order will be applied %05.8f", marketName, newThreshold ) );
         }
     }
