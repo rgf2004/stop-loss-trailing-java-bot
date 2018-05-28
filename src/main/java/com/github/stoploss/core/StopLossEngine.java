@@ -99,9 +99,7 @@ public class StopLossEngine {
                     case BUY:
 
                         if (currentPrice.compareTo ( marketMonitor.getCurrentThreshold () ) >= 0) { // Buy case
-                            LOGGER.info ( String.format ( "%10s Buy Request will be applied at price %05.8f", marketName, currentPrice ) );
-                            marketMonitor.setCurrentThreshold ( Utils.calculateThreshold ( Action.SELL, currentPrice, marketMonitor.getMarket ().getPercentage () ) );
-                            marketMonitor.setAction ( Action.SELL );
+                            marketMonitor.setCurrentUUId ( createOrder ( marketMonitor.getAction (), marketName, currentPrice, marketMonitor.getMarket ().getAmount () ) );
                         } else {
                             BigDecimal newBuyThreshold = Utils.calculateThreshold ( Action.BUY, currentPrice, marketMonitor.getMarket ().getPercentage () );
                             if (currentPrice.compareTo ( newBuyThreshold ) < 0 && newBuyThreshold.compareTo ( marketMonitor.getCurrentThreshold () ) < 0) {
