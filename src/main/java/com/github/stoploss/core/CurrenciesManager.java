@@ -40,17 +40,27 @@ public class CurrenciesManager {
         return new HashMap<> ( marketsMonitor );
     }
 
-    public MarketMonitor getMarketMonitor(String marketName)
+    MarketMonitor getMarketMonitor(String marketName)
     {
         return marketsMonitor.get ( marketName );
     }
 
-    public void initThreshold(String marketName, BigDecimal currentPrice)
+    void initThreshold(String marketName, BigDecimal currentPrice)
     {
         Action action = marketsMonitor.get ( marketName ).getAction ();
         BigDecimal percentage = marketsMonitor.get ( marketName ).getPercentage ();
 
         BigDecimal threshold = Utils.calculateThreshold ( action, currentPrice, percentage );
         marketsMonitor.get ( marketName ).setCurrentThreshold ( threshold );
+    }
+
+    public String buildResponseMessage(Map.Entry<String, MarketMonitor> entry)
+    {
+        return String.format ( "Currency %s, Amount %.8f, Action %s, Price %.8f, Threshold %.8f",
+                entry.getKey (),
+                entry.getValue ().getAmount (),
+                entry.getValue ().getAction (),
+                entry.getValue ().getCurrentPrice (),
+                entry.getValue ().getCurrentThreshold ());
     }
 }

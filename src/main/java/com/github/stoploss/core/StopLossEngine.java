@@ -58,7 +58,7 @@ class StopLossEngine {
             marketMonitor.setCurrentPrice ( currentPrice );
             currenciesManager.initThreshold ( marketName, currentPrice );
 
-            LOGGER.info ( String.format ( "%10s First Time Market Action %s with current last %05.8f, current threshold %05.8f", marketName, marketMonitor.getAction (), currentPrice, marketMonitor.getCurrentThreshold () ) );
+            LOGGER.info ( String.format ( "%10s First Time - Action %s with current last %05.8f, current threshold %05.8f", marketName, marketMonitor.getAction (), currentPrice, marketMonitor.getCurrentThreshold () ) );
         } else {
 
             if (marketMonitor.getCurrentUUId () == null) {
@@ -70,7 +70,7 @@ class StopLossEngine {
                         } else {
                             BigDecimal newSellThreshold = Utils.calculateThreshold ( Action.SELL, currentPrice, marketMonitor.getPercentage () );
                             if (currentPrice.compareTo ( newSellThreshold ) > 0 && newSellThreshold.compareTo ( marketMonitor.getCurrentThreshold () ) > 0) {
-                                LOGGER.info ( String.format ( "%10s New Stop Loss will be applied %05.8f", marketName, newSellThreshold ) );
+                                LOGGER.info ( String.format ( "%10s - Action %s New Stop Loss will be applied %05.8f", marketName, marketMonitor.getAction () ,  newSellThreshold ) );
                                 marketMonitor.setCurrentThreshold ( newSellThreshold );
                             } else {
                                 LOGGER.info ( String.format ( "%10s - Action %s Still current configuration valid with current last %05.8f, current threshold %05.8f", marketName, marketMonitor.getAction (), currentPrice, marketMonitor.getCurrentThreshold () ) );
@@ -85,7 +85,7 @@ class StopLossEngine {
                         } else {
                             BigDecimal newBuyThreshold = Utils.calculateThreshold ( Action.BUY, currentPrice, marketMonitor.getPercentage () );
                             if (currentPrice.compareTo ( newBuyThreshold ) < 0 && newBuyThreshold.compareTo ( marketMonitor.getCurrentThreshold () ) < 0) {
-                                LOGGER.info ( String.format ( "%10s New Stop Loss will be applied %05.8f", marketName, newBuyThreshold ) );
+                                LOGGER.info ( String.format ( "%10s - Action %s New Stop Loss will be applied %05.8f", marketName, marketMonitor.getAction () ,  newBuyThreshold ) );
                                 marketMonitor.setCurrentThreshold ( newBuyThreshold );
                             } else {
                                 LOGGER.info ( String.format ( "%10s - Action %s Still current configuration valid with current last %05.8f, current threshold %05.8f", marketName, marketMonitor.getAction (), currentPrice, marketMonitor.getCurrentThreshold () ) );
