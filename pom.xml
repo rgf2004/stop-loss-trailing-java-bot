@@ -18,6 +18,13 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 
+	<repositories>
+		<repository>
+			<id>jitpack.io</id>
+			<url>https://jitpack.io</url>
+		</repository>
+	</repositories>
+
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -45,10 +52,16 @@
 			<scope>provided</scope>
 		</dependency>
 
+		<!--<dependency>-->
+			<!--<groupId>de.elbatya.cryptocoins</groupId>-->
+			<!--<artifactId>bittrex-client</artifactId>-->
+			<!--<version>2.0</version>-->
+		<!--</dependency>-->
+
 		<dependency>
-			<groupId>de.elbatya.cryptocoins</groupId>
-			<artifactId>bittrex-client</artifactId>
-			<version>2.0</version>
+			<groupId>com.github.forgemo</groupId>
+			<artifactId>bittrex-java-client</artifactId>
+			<version>v2.0</version>
 		</dependency>
 
 		<dependency>
@@ -59,6 +72,7 @@
 	</dependencies>
 
 	<build>
+
 		<resources>
 			<resource>
 				<directory>src/main/resources</directory>
@@ -69,6 +83,7 @@
 				<filtering>false</filtering>
 			</resource>
 		</resources>
+
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
