@@ -2,4 +2,4 @@
 
 [![Build Status](https://travis-ci.org/rgf2004/stop-loss-trailing-java-bot.svg?branch=master)](https://travis-ci.org/rgf2004/stop-loss-trailing-java-bot)
 
-[![Coverage Status](https://coveralls.io/repos/github/rgf2004/stop-loss-trailing-java-bot/badge.svg?branch=master)](https://coveralls.io/github/rgf2004/stop-loss-trailing-java-bot?branch=master)
+[![codebeat badge](https://codebeat.co/badges/54bcb1e6-0810-424a-a766-795d1169e5ee)](https://codebeat.co/projects/github-com-rgf2004-stop-loss-trailing-java-bot-master)
