@@ -15,22 +15,40 @@ public class CurrenciesManager {
     private Map<String, MarketMonitor> marketsMonitor = new HashMap<> ();
 
     public CurrenciesManager() {
-        //TODO will be configuration
-        String percentage = "0.05";
-        String amount = "0.01";
+    }
 
-        MarketMonitor ltc = new MarketMonitor ( Action.SELL, new BigDecimal ( amount ), new BigDecimal ( percentage ) );
-        this.marketsMonitor.put ( "USDT-LTC", ltc );
+    public void addCurrency(String marketNameString, String amountString, String percentageString) throws IllegalArgumentException
+    {
+        BigDecimal amount = null;
+        BigDecimal percentage = null;
 
-        MarketMonitor dash = new MarketMonitor ( Action.SELL, new BigDecimal ( amount ), new BigDecimal ( percentage ) );
-        this.marketsMonitor.put ( "USDT-DASH", dash );
+        String marketName = marketNameString.toUpperCase ();
 
-        MarketMonitor eth = new MarketMonitor ( Action.SELL, new BigDecimal ( amount ), new BigDecimal ( percentage ) );
-        this.marketsMonitor.put ( "USDT-ETH", eth );
+        try
+        {
+            amount = new BigDecimal ( amountString );
+            percentage = new BigDecimal ( percentageString );
+        }
+        catch (Exception e)
+        {
+            throw new IllegalArgumentException ( "value of amount|percentage is invalid" );
+        }
 
-        MarketMonitor btc = new MarketMonitor ( Action.SELL, new BigDecimal ( amount ), new BigDecimal ( percentage ) );
-        this.marketsMonitor.put ( "USDT-BTC", btc );
+        if (this.marketsMonitor.containsKey ( marketName ))
+        {
+            if ( getPercentage ( marketName ).compareTo ( percentage ) != 0)
+                setCurrentPrice ( marketName, null ); // this is mandatory to recalculate the threshold
 
+            setAmount ( marketName, amount );
+            setPercentage ( marketName, percentage );
+        }
+        else
+        {
+            //TODO there should be check on valid market name
+            //TODO action also should be parameter and not be default sell
+            MarketMonitor market = new MarketMonitor ( Action.SELL, amount, percentage );
+            this.marketsMonitor.put ( marketName , market );
+        }
     }
 
     MarketMonitor getMarketMonitor(String marketName) {
