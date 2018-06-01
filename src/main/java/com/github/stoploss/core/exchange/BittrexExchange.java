@@ -39,12 +39,12 @@ public class BittrexExchange {
         bittrexClient = new BittrexClient ( credentials );
     }
 
-    public BigDecimal getCurrentPrice(String marketName) {
+    public BigDecimal getCurrentPrice(String marketName) throws IllegalArgumentException{
         try {
             return bittrexClient.getPublicApi ().getTicker ( marketName ).unwrap ().getLast ();
-        } catch (Exception e) {
+        } catch (BittrexApiException e) {
             LOGGER.error ( "Error While Getting Ticker", e );
-            return null;
+            throw new IllegalArgumentException("Invalid Market");
         }
     }
 

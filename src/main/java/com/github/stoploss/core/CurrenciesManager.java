@@ -51,6 +51,11 @@ public class CurrenciesManager {
         }
     }
 
+    public void removeCurrency(String marketName)
+    {
+        marketsMonitor.remove ( marketName );
+    }
+
     MarketMonitor getMarketMonitor(String marketName) {
         return marketsMonitor.get ( marketName );
     }

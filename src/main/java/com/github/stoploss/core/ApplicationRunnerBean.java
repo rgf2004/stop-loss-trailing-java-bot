@@ -18,9 +18,15 @@ public class ApplicationRunnerBean implements ApplicationRunner {
     @Override
     public void run(ApplicationArguments args) throws Exception {
 
-        telegramBot.sendCustomTextMessage ( "Stop-loss application has been started now" );
+        try {
+            telegramBot.sendCustomTextMessage ( "Stop-loss application has been started now" );
 
-        stopLossEngine.startEngine ();
+            stopLossEngine.startEngine ();
+        }
+        catch (Exception e)
+        {
+            telegramBot.sendCustomTextMessage ( "Severe issue occured, bot going to exit [" + e.getMessage () + "]" );
+        }
 
     }
 }

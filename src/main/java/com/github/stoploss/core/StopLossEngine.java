@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
 import java.util.AbstractMap;
@@ -37,7 +38,7 @@ class StopLossEngine {
 
         while (true) {
 
-            Map<String, BigDecimal> currentPrices = currenciesManager.getMarketsMonitor ().keySet ().stream ().map ( this::getPriceByMarketName ).collect ( Collectors.toMap ( Map.Entry::getKey, Map.Entry::getValue ) );
+            Map<String, BigDecimal> currentPrices = currenciesManager.getMarketsMonitor ().keySet ().stream ().map ( this::getPriceByMarketName ).filter ( out -> out != null ).collect ( Collectors.toMap ( Map.Entry::getKey, Map.Entry::getValue ) );
 
             currentPrices.forEach ( this::processNewPrice );
 
@@ -46,8 +47,15 @@ class StopLossEngine {
     }
 
     private Map.Entry<String, BigDecimal> getPriceByMarketName(String marketName) {
-        BigDecimal currentPrice = bittrex.getCurrentPrice ( marketName );
-        return new AbstractMap.SimpleEntry<> ( marketName, currentPrice );
+        try {
+            BigDecimal currentPrice = bittrex.getCurrentPrice ( marketName );
+            return new AbstractMap.SimpleEntry<> ( marketName, currentPrice );
+        } catch (IllegalArgumentException e)
+        {
+            telegramBot.sendCustomTextMessage ( String.format ( "Invalid Market %10s and will be removed ", marketName ) );
+            currenciesManager.removeCurrency ( marketName );
+            return null;
+        }
     }
 
     private void processNewPrice(String marketName, BigDecimal currentPrice) {
@@ -115,7 +123,15 @@ class StopLossEngine {
 
     private String createOrder(Action action, String marketName, BigDecimal price, BigDecimal amount) {
         LOGGER.info ( String.format ( "%10s New %s Order Request will be applied at price %05.8f, amount %05.8f", marketName, action, price, amount ) );
-        telegramBot.sendCustomTextMessage ( String.format ( "%10s New %s Order Request will be applied at price %05.8f, amount %05.8f", marketName, action, price, amount ) );
-        return bittrex.placeOrder ( action, marketName, price, amount );
+        String uuid =  bittrex.placeOrder ( action, marketName, price, amount );
+        if (uuid != null)
+        {
+            telegramBot.sendCustomTextMessage ( String.format ( "%10s New %s Order Request has been applied at price %05.8f, amount %05.8f", marketName, action, price, amount ) );
+        }
+        else
+        {
+            telegramBot.sendCustomTextMessage ( String.format ( "%10s New %s Order Request has been failed PLEASE take an action", marketName, action) );
+        }
+        return uuid;
     }
 }
