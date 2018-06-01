@@ -129,4 +129,9 @@ public class CurrenciesManager {
         return new HashMap<> ( marketsMonitor );
     }
 
+    public void clearAll()
+    {
+        marketsMonitor.clear ();
+    }
+
 }

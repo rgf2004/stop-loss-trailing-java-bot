@@ -1,17 +1,28 @@
 package com.github.stoploss.core;
 
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.math.BigDecimal;
 
 @RunWith(SpringRunner.class)
+@SpringBootTest(classes = {CurrenciesManager.class})
 public class CurrenciesManagerTest {
 
-    //TODO make it autowiring
-    CurrenciesManager currenciesManager = new CurrenciesManager ();
+    @Autowired
+    CurrenciesManager currenciesManager;
+
+    @Before
+    public void setup() {
+        currenciesManager.clearAll ();
+    }
+
 
     @Test
     public void testAddNewCurrency() {
